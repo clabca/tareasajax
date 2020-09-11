@@ -6,8 +6,8 @@
      '',
      'taskcursoajax'
  );
- if($connection){
-     echo "Base de Datos Conectada";
- }
+//  if($connection){
+//     echo "Base de Datos Conectada";
+// }
 
 ?>

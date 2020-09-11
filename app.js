@@ -14,7 +14,34 @@ $(function() {
             type: 'POST',
             data: {search},
             success : function(response){
-                console.log(response);
+              
+                // Mostrar por Consola Resultados
+                 console.log(response);
+
+
+                // string a json
+                // guarda json en variable tasks
+                let tasks = JSON.parse(response);
+                
+                // declara variable template como string
+                let template ='';
+
+
+                // Mostrar por Consola Resultados
+                console.log(tasks);
+
+                //recorrer las filas
+                tasks.forEach(task => {
+                // Mostrar por Consola Resultados
+                    console.log(task);
+
+                    template += `<li> 
+                    ${task.name}
+                    </li>`
+
+
+                });
+
             }
         })
     })
