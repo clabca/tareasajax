@@ -1,4 +1,8 @@
 $(function() {
+
+    // variable para comparar si es edicion
+    let edit = false
+
     console.log('jQuery is Working');
 
     // al comenzar ocutar html id=task-result
@@ -30,7 +34,7 @@ $(function() {
             success : function(response){
               
                 // Mostrar por Consola Resultados
-                 console.log(response);
+                // console.log(response);
 
 
                 // string a json
@@ -42,12 +46,12 @@ $(function() {
 
 
                 // Mostrar por Consola Resultados
-                console.log(tasks);
+                //console.log(tasks);
 
                 //recorrer las filas
                 tasks.forEach(task => {
                 // Mostrar por Consola Resultados
-                    console.log(task);
+                    //console.log(task);
 
                     template += `<li> 
                         ${task.name}
@@ -76,18 +80,31 @@ $(function() {
 
             const postData = {
                 name: $('#name').val(),
-                description: $('#description').val()
+                description: $('#description').val(),
+                id: $('#taskId').val()
 
             };
             
-            console.log(postData);
+            //console.log(postData);
             
-            $.post('task-add.php', postData, function(response) {
-                console.log(response);
+
+            // operador ternario si edit es  true o false
+            //edit ? '': '' ;
+
+            // si edit es falso ocupe task-add.php si no task-edit.php
+            let url = edit === false ? 'task-add.php' : 'task-edit.php';
+
+            console.log(url)
+
+            // $.post('task-add.php', postData, function(response) {
+            $.post(url, postData, function(response) {
+                //    console.log(response);
                 fetchTasks();
 
                 // Limpiar Formulario
                 $('#task-form').trigger('reset');
+                edit = false;
+
                 
             });
 
@@ -103,7 +120,7 @@ $(function() {
                 url: 'task-list.php',
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
     
                     let tasks = JSON.parse(response);
                     let template ='';
@@ -111,7 +128,11 @@ $(function() {
                         template += `
                             <tr taskID="${task.id}">
                                 <td>${task.id}</td>
-                                <td>${task.name}</td>
+                                <td>
+                                    <a href="#" class="task-item" >
+                                        ${task.name}
+                                    </a>
+                                </td>
                                 <td>${task.description}</td>
                                 <td>
                                     <button class="task-delete btn btn-danger">
@@ -139,18 +160,51 @@ $(function() {
         $(document).on('click', '.task-delete', function(){
             //console.log($(this));
 
+            if (confirm('Estas Seguro de Querer Eliminar El Registro?')){
+
+
+
             //seleccionando el padre del padre del elemento (button) (td) (tr)
             let element = $(this)[0].parentElement.parentElement;
 
             //tomando el valor del atributo taskId del tr
             let id = $(element).attr('taskId');
 
-            //console.log(id);
+             // console.log(id);
 
-            // 01:47
+            $.post('task-delete.php', {id}, function(response) {
+                console.log(response);
+                
+                
+                fetchTasks();
+
+
+            })
+        }
 
 
         })
 
+        $(document).on('click', '.task-item', function(){
+            //console.log('Editando');
 
+            //seleccionando el padre del padre del elemento (button) (td) (tr)
+            let element = $(this)[0].parentElement.parentElement;
+
+            //tomando el valor del atributo taskId del tr
+            let id = $(element).attr('taskId');
+
+             //console.log(id);
+
+             $.post('task-single.php', {id}, function(response) {
+                //console.log(response);
+                
+                const task = JSON.parse(response);
+                $('#name').val(task.name);
+                $('#description').val(task.description);
+                $('#taskId').val(task.id);
+                // es edicion
+                edit = true;
+        });
+    });
 });
